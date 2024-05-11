@@ -1,5 +1,5 @@
 use std::io;
-use rand::{thread_rng, Rng};
+use rand::{Rng};
 
 fn main() {
     println!("Generating a new password");
@@ -15,7 +15,7 @@ fn main() {
     let length: u32 = match length.trim().parse() {
         Ok(num) if num >= 12 && num <= 64 => num,
         Ok(num) => {
-            println!("Password length should be between 12 and 64 characters.");
+            println!("Password length should be between 12 and 64 characters: {num}");
             return;
         }
         Err(_) => {

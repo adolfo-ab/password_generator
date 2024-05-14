@@ -1,6 +1,6 @@
 use std::io;
 use std::io::Write;
-use rand::thread_rng;
+use rand::{thread_rng};
 use rand::seq::SliceRandom;
 
 const UPPERCASE_LETTERS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -33,31 +33,28 @@ fn get_password_length() -> u32 {
 }
 
 fn generate_password(length: u32) -> String {
-    let mut charsets: [&[u8]; 4] = [
+    let charsets: [&[u8]; 4] = [
         UPPERCASE_LETTERS,
         LOWERCASE_LETTERS,
         NUMBERS,
         SPECIAL_CHARS,
     ];
 
-    let mut rng = thread_rng();
-    charsets.shuffle(&mut rng);
+    let mut rng1 = thread_rng();
 
     let mut merged = Vec::new();
-    let mut remaining_length = length;
 
-    for (i, charset) in charsets.iter().enumerate() {
-        let chunk_size = if i == charsets.len() - 1 {
-            remaining_length
-        } else {
-            remaining_length / (charsets.len() - i) as u32
-        };
-        merged.extend(charset.choose_multiple(&mut rng, chunk_size as usize).cloned());
-        remaining_length -= chunk_size;
+    // Ensure we have at least 1 character of each type
+    for charset in charsets.iter() {
+        merged.push(*charset.choose(&mut rng1).unwrap());
     }
 
-    let mut rng_final_charset = thread_rng();
-    merged.shuffle(&mut rng_final_charset);
+    // Fill the rest of the password randomly
+    let all_chars: Vec<u8> = charsets.concat();merged.extend((0..length-4).map(|_| all_chars.choose(&mut rng1)).flatten());
+
+    let mut rng2 = thread_rng();
+    merged.shuffle(&mut rng2);
 
     return merged.into_iter().map(|b| b as char).collect();
 }
+
